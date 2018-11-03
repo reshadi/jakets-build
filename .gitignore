@@ -1,0 +1,6 @@
+node_modules/
+build/
+Jakefile.js
+Jakefile.dep.*
+Out-Null
+Build.js

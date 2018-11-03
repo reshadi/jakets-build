@@ -1,0 +1,26 @@
+{
+  "name": "jakets-build",
+  "version": "1.0.0",
+  "description": "A simple set of functions to easily build client/server code",
+  "main": "Jakefile.js",
+  "scripts": {
+    "test": "jakets test",
+    "release": "jake update_version_range_tags[true]"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reshadi/jakets-build.git"
+  },
+  "author": "Mehrdad Reshadi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/reshadi/jakets-build/issues"
+  },
+  "homepage": "https://github.com/reshadi/jakets-build#readme",
+  "dependencies": {
+    "jakets": "git+https://github.com/reshadi/jakets.git#v7.x.x",
+    "jakets-closure": "git+https://github.com/reshadi/jakets-closure.git#v1.x.x",
+    "jakets-rollup": "git+https://github.com/reshadi/jakets-rollup.git#v1.x.x",
+    "jakets-uglifyjs": "git+https://github.com/reshadi/jakets-uglifyjs.git#v1.x.x"
+  }
+}

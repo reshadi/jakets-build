@@ -17,16 +17,14 @@ export const PreCompileTask = Jakets.FileTask(`${Jakets.BuildDir}/.precompile`, 
 });
 
 export function CopyFileTask(src: string, dest: string) {
-  PreCompileTask.DependsOn([
-    Jakets.FileTask(
-      dest,
-      [src, Jakets.DirectoryTask(Path.dirname(dest))],
-      async () => {
-        console.log(`cp ${src} ${dest}`);
-        Fs.writeFileSync(dest, Fs.readFileSync(src));
-      }
-    )
-  ]);
+  return Jakets.FileTask(
+    dest,
+    [src, Jakets.DirectoryTask(Path.dirname(dest))],
+    async () => {
+      console.log(`cp ${src} ${dest}`);
+      Fs.writeFileSync(dest, Fs.readFileSync(src));
+    }
+  )
 }
 
 export class TscCompileTask {

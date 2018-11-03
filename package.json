@@ -1,6 +1,6 @@
 {
   "name": "jakets-build",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple set of functions to easily build client/server code",
   "main": "Jakefile.js",
   "scripts": {

@@ -8,11 +8,11 @@ import * as Rollup from "jakets-rollup/lib/RollupTask";
 import * as Closure from "jakets-closure/lib/ClosureTask";
 import { FileTask } from "jakets/lib/task/FileTask";
 
-const MakeRelative = Jakets.CreateMakeRelative(__dirname);
+// const MakeRelative = Jakets.CreateMakeRelative(__dirname);
 
 
 //NOTE: this has to be a file task, otherwise, other file tasks will always trigger
-export const PreCompileTask = Jakets.FileTask(`${Jakets.BuildDir}/.precompile`, [MakeRelative("Jakefile.ts")], async function () {
+export const PreCompileTask = Jakets.FileTask(`${Jakets.BuildDir}/.precompile`, [Jakets.MakeRelativeToWorkingDir("Jakefile.ts")], async function () {
   return Jakets.ExecAsync(`touch ${this.GetName()}`);
 });
 
@@ -28,7 +28,7 @@ export function CopyFileTask(src: string, dest: string) {
 }
 
 export class TscCompileTask {
-  readonly CompileDir = MakeRelative(Jakets.BuildDir + "/compile");
+  readonly CompileDir = Jakets.MakeRelativeToWorkingDir(Jakets.BuildDir + "/compile");
 
   readonly DefaultTscOptions: Typescript.CompilerOptions = {
     // module: Typescript.ModuleKind.ES2015,

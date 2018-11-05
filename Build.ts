@@ -53,39 +53,41 @@ export class TscCompileTask {
   }
 
   constructor(
-    options?: Typescript.CompilerOptions,
+    options?: { tsc?: Typescript.CompilerOptions },
     compileSubDir?: string
   ) {
     if (compileSubDir) {
       this.CompileDir += compileSubDir;
       this.DefaultTscOptions.outDir = this.CompileDir;
     }
-    if (options) {
-      this.DefaultTscOptions = this.TscOptions(options, this.DefaultTscOptions);
-    }
+    this.DefaultTscOptions = { ...this.DefaultTscOptions, ...(options && options.tsc) };
+    // this.TscOptions(options, this.DefaultTscOptions);
+
   }
 
   Compile(
     name: string
     , filenames: string[]
     , dependencies?: Parameters<typeof TscTask>[2]
-    , options?: Typescript.CompilerOptions
   ): FileTask {
     return TscTask(
       name
       , filenames
       , (dependencies || []).concat([PreCompileTask, Jakets.DirectoryTask(Path.dirname(this.CompileDir))])
-      , this.TscOptions(options, this.DefaultTscOptions)
+      , this.DefaultTscOptions
     );
   }
 }
 
 export class ServerTscCompileTask extends TscCompileTask {
-  constructor() {
+  constructor(options?: { tsc?: Typescript.CompilerOptions }) {
     super(
       {
-        module: Typescript.ModuleKind.CommonJS,
-        target: Typescript.ScriptTarget.ES2015,
+        tsc: {
+          module: Typescript.ModuleKind.CommonJS,
+          target: Typescript.ScriptTarget.ES2015,
+        },
+        ...options
       },
       "/server"
     );
@@ -111,34 +113,47 @@ export class ClientTscCompileTask extends TscCompileTask {
     // externs: ["extern_jquery.js", "extern_bootstrap.js"]
   };
 
-  constructor() {
+  readonly IsRelease: boolean = true;
+
+  constructor(options?: {
+    tsc?: Typescript.CompilerOptions,
+    rollup?: Rollup.RollupOptions,
+    closure?: Closure.ClosureOptions,
+    isRelease?: boolean
+  }) {
     super(
       {
-        module: Typescript.ModuleKind.ES2015,
-        // target: Typescript.ScriptTarget.ES5,
-        target: Typescript.ScriptTarget.ES2015,
-        lib: ["es2015", "dom", "scripthost"].map(l => `lib.${l}.d.ts`),
-        // outDir: DebugDir,
+        tsc: {
+          module: Typescript.ModuleKind.ES2015,
+          target: Typescript.ScriptTarget.ES5,
+          // target: Typescript.ScriptTarget.ES2015,
+          lib: ["es2015", "dom", "scripthost"].map(l => `lib.${l}.d.ts`),
+          // outDir: DebugDir,
+        },
+        ...options
       }
       , "/client"
     );
     this.DebugDir = this.CompileDir + "/debug";
     this.ReleaseDir = this.CompileDir + "/release";
     this.DefaultTscOptions.outDir = this.DebugDir;
+
+    if (options) {
+      this.RollupOptions = { ...this.RollupOptions, ...options.rollup };
+      this.ClosureOptions = { ...this.ClosureOptions, ...options.closure };
+      this.IsRelease = options.isRelease !== false;
+    }
   }
 
   Compile(
     name: string
     , filenames: string[]
     , dependencies?: Parameters<typeof TscTask>[2]
-    , options?: Typescript.CompilerOptions
-    , isRelease: boolean = true
   ): FileTask {
     let compileTask = super.Compile(
       "debug/tsc/" + name
       , filenames
       , dependencies
-      , options
     );
 
     let filename = `${name}.js`;
@@ -152,7 +167,7 @@ export class ClientTscCompileTask extends TscCompileTask {
       , this.RollupOptions
     );
 
-    if (!isRelease) {
+    if (!this.IsRelease) {
       return packageTask;
     }
 

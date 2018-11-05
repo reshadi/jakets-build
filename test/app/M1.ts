@@ -1,3 +1,5 @@
-export function F(msg: string) {
-  console.log(msg);
+export class X {
+  F(msg: string) {
+    console.log(msg);
+  }
 }

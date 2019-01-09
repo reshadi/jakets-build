@@ -101,7 +101,7 @@ export class ClientTscCompileTask extends TscCompileTask {
 
   readonly RollupOptions: Rollup.RollupOptions = {
     Bundle: {
-      dest: "",
+      // dest: "",
       format: "iife",
       // moduleName: "TopModule",
       // sourceMap: "inline",

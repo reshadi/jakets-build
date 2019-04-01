@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/reshadi/jakets-build#readme",
   "dependencies": {
-    "jakets": "git+https://github.com/reshadi/jakets.git#v7.x.x",
+    "jakets": "^7.6.4",
     "jakets-closure": "git+https://github.com/reshadi/jakets-closure.git#v1.x.x",
     "jakets-rollup": "git+https://github.com/reshadi/jakets-rollup.git#v1.x.x",
     "jakets-uglifyjs": "git+https://github.com/reshadi/jakets-uglifyjs.git#v1.x.x"

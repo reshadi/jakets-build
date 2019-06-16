@@ -48,43 +48,75 @@ export class ClientTscCompileTask<OptionsType extends ClientTscOptions> extends 
     );
     this.DebugDir = this.CompileDir + "/debug";
     this.ReleaseDir = this.CompileDir + "/release";
-    this.Options.tsc.outDir = this.DebugDir;
+    // this.Options.tsc.outDir = this.DebugDir;
   }
 
   Compile(
     name: string
     , filenames: string[]
     , dependencies?: Parameters<typeof TscTask>[2]
+    , options?: ClientTscOptions
   ): FileTask {
+    let debugDir = `${this.DebugDir}/${name}`;
+
+    /**
+     * We have to make a copy of all the options in case any of the following functions change them.
+     * Also, note that ... is a shallow clone, not a deep clone
+     */
+    let clientOptions = {
+      tsc: {
+        ...this.Options.tsc,
+        outDir: debugDir,
+        ...options && options.tsc,
+      },
+      rollup: {
+        ...this.Options.rollup,
+        ...options && options.rollup,
+      },
+      closure: {
+        ...this.Options.closure,
+        ...options && options.closure
+      },
+    };
+
+    if (clientOptions.tsc.outDir) {
+      debugDir = clientOptions.tsc.outDir;
+    }
+    let filename = `${name}.js`;
+    let debugFile = `${debugDir}/${filename}`;
+
     let compileTask = super.Compile(
       "debug/tsc/" + name
       , filenames
       , dependencies
+      , clientOptions
     );
 
-    let filename = `${name}.js`;
-    let debugFile = `${this.DebugDir}/${filename}`;
+    let jsFile = new jake.FileList();
+    jsFile.include(debugDir+"/**/*.js");
 
     let packageTask = Rollup.RollupTask(
       "debug/rollup/" + name
       , debugFile
-      , filenames.map(f => Path.join(this.DebugDir, f.replace(".ts", ".js")))
+      , filenames.map(f => Path.join(debugDir, f.replace(".ts", ".js")))
+      // , jsFiles.toArray()
       , [compileTask]
-      , this.Options.rollup
+      , clientOptions.rollup
     );
 
-    if (this.Options.closure === null) {
+    if (clientOptions.closure === null) {
       return packageTask;
     }
 
-    let releaseFile = `${this.ReleaseDir}/${filename}`;
+    let releaseDir = `${this.ReleaseDir}/${name}`;
+    let releaseFile = `${releaseDir}/${filename}`;
 
     let optimizeTask = Closure.ClosureTask(
       "release/closure/" + name
-      , [packageTask.GetName(), Jakets.DirectoryTask(Path.dirname(this.ReleaseDir)).GetName()]
+      , [packageTask.GetName(), Jakets.DirectoryTask(Path.dirname(releaseFile)).GetName()]
       , releaseFile
       , [debugFile]
-      , this.Options.closure
+      , clientOptions.closure
     );
     return optimizeTask;
   }

@@ -6,26 +6,6 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "App",
-      "program": "${workspaceRoot}/server/App.ts",
-      "stopOnEntry": false,
-      "args": [
-        "--debug"
-      ],
-      "cwd": "${workspaceRoot}",
-      "runtimeArgs": [],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "sourceMaps": true,
-      "outFiles": [
-        "${workspaceRoot}/build/compile/server/**/*.js"
-      ],
-      "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "Build",
       "program": "${workspaceRoot}/node_modules/jake/bin/cli.js",
       "stopOnEntry": false,
@@ -52,7 +32,7 @@
       "program": "${workspaceRoot}/node_modules/jake/bin/cli.js",
       "stopOnEntry": false,
       "args": [
-        "test"
+        "build_test"
       ],
       "cwd": "${workspaceRoot}",
       "runtimeExecutable": null,

@@ -13,6 +13,10 @@ export class CompileTask<OptionsType> {
 }
 
 //NOTE: this has to be a file task, otherwise, other file tasks will always trigger
-export const PreCompileTask = Jakets.FileTask(`${Jakets.BuildDir}/.precompile`, [Jakets.MakeRelativeToWorkingDir("Jakefile.ts")], async function () {
-  return Jakets.ExecAsync(`touch ${this.GetName()}`);
-});
+export const PreCompileTask = Jakets.FileTask(
+  `${Jakets.BuildDir}/.precompile`,
+  [Jakets.MakeRelativeToWorkingDir("Jakefile.ts")],
+  async function () {
+    return Jakets.ExecAsync(`touch ${this.GetName()}`);
+  }
+);

@@ -10,11 +10,12 @@ export interface TscOptions {
   tsc?: Typescript.CompilerOptions
 }
 
-export class TscCompileTask<OptionsType extends TscOptions = TscOptions> extends CompileTask<OptionsType> {
+export class TscCompileTask<OptionsType extends TscOptions = TscOptions> extends CompileTask<OptionsType & Required<TscOptions>> {
 
   constructor(options?: OptionsType, compileSubDir?: string) {
     super(
       {
+        ...options || {} as OptionsType,
         tsc: {
           // module: Typescript.ModuleKind.ES2015,
           // target: Typescript.ScriptTarget.ES5,
@@ -30,8 +31,8 @@ export class TscCompileTask<OptionsType extends TscOptions = TscOptions> extends
           noImplicitReturns: true,
           pretty: true,
           rootDir: Jakets.MakeRelativeToWorkingDir("."),
+          ...options && options.tsc
         },
-        ...options || {} as OptionsType
       }
       , compileSubDir
     );
@@ -42,12 +43,17 @@ export class TscCompileTask<OptionsType extends TscOptions = TscOptions> extends
     name: string
     , filenames: string[]
     , dependencies?: Parameters<typeof TscTask>[2]
+    , options?: TscOptions
   ): FileTask {
+    let tscOptions = {
+      ...this.Options.tsc,
+      ...options && options.tsc
+    };
     return TscTask(
       name
       , filenames
-      , (dependencies || []).concat([PreCompileTask, Jakets.DirectoryTask(Path.dirname(this.CompileDir))])
-      , this.Options.tsc
+      , (dependencies || []).concat([PreCompileTask, Jakets.DirectoryTask(tscOptions.outDir || this.CompileDir)])
+      , tscOptions
     );
   }
 }
